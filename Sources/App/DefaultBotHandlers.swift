@@ -21,7 +21,6 @@ final class DefaultBotHandlers {
         let handler = TGMessageHandler(filters: (.all && !.command.names(["/ping", "/show_buttons"]))) { update, bot in
             let params: TGSendMessageParams = .init(chatId: .chat(update.message!.chat.id), text: "Success")
             try bot.sendMessage(params: params)
-            print("hi")
         }
         bot.connection.dispatcher.add(handler)
     }
