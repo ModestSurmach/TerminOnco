@@ -18,6 +18,7 @@ public func configure(_ app: Application) throws {
     
     
     DefaultBotHandlers.addHandlers(app: app, bot: TGBot.shared)
+    MainMenuHandler.addHandlers(app: app, bot: TGBot.shared)
     
     // register routes
     try routes(app)
