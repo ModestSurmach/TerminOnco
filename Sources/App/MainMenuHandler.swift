@@ -11,7 +11,7 @@ import telegram_vapor_bot
 final class MainMenuHandler {
     
     static func addHandlers(app: Vapor.Application, bot: TGBotPrtcl) {
-        
+        startHandler(app: app, bot: bot)
     }
     
     private static func startHandler(app: Vapor.Application, bot: TGBotPrtcl) {
