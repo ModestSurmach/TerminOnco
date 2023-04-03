@@ -10,6 +10,9 @@ import Vapor
 import telegram_vapor_bot
 
 
-final class RepeatedAppointment {
+final class RepeatedAppointmentHandler {
     
+    static func addHandler(app: Vapor.Application, bot: TGBotPrtcl) {
+        
+    }
 }
