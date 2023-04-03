@@ -11,19 +11,11 @@ import telegram_vapor_bot
 final class DefaultBotHandlers {
 
     static func addHandlers(app: Vapor.Application, bot: TGBotPrtcl) {
-        defaultHandler(app: app, bot: bot)
         commandPingHandler(app: app, bot: bot)
         commandShowButtonsHandler(app: app, bot: bot)
         buttonsActionHandler(app: app, bot: bot)
     }
 
-    private static func defaultHandler(app: Vapor.Application, bot: TGBotPrtcl) {
-        let handler = TGMessageHandler(filters: (.all && !.command.names(["/ping", "/show_buttons"]))) { update, bot in
-            let params: TGSendMessageParams = .init(chatId: .chat(update.message!.chat.id), text: "Success")
-            try bot.sendMessage(params: params)
-        }
-        bot.connection.dispatcher.add(handler)
-    }
 
     private static func commandPingHandler(app: Vapor.Application, bot: TGBotPrtcl) {
         let handler = TGCommandHandler(commands: ["/ping"]) { update, bot in
