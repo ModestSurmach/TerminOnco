@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import telegram_vapor_bot
+import AppKit
 
 
 var name: String?
@@ -58,7 +59,7 @@ final class PrimaryAppointmentHandler {
             guard let userId = update.callbackQuery?.message?.chat.id else { fatalError("user id not found") }
             
             var nameButton: [TGInlineKeyboardButton] = [.init(text: "ФИО:", callbackData: "fioHandler")]
-            let phoneButton: [TGInlineKeyboardButton] = [.init(text: "Телефон", callbackData: "phoneNumber")]
+            var phoneButton: [TGInlineKeyboardButton] = [.init(text: "Телефон", callbackData: "phoneNumber")]
             var dateOfBirthButton: [TGInlineKeyboardButton] = [.init(text: "Введите дату рождения", callbackData: "birtheyData")]
 
             var buttons: [[TGInlineKeyboardButton]] = [nameButton, phoneButton, dateOfBirthButton]
@@ -79,10 +80,9 @@ final class PrimaryAppointmentHandler {
 
                     nameButton = [.init(text: "ФИО: \(name!)", callbackData: "fioHandler")]
                     
-                    
                     var buttons: [[TGInlineKeyboardButton]] = [nameButton, phoneButton, dateOfBirthButton]
                     
-                    if name != nil && dateOfBirthday != nil {
+                    if name != nil && dateOfBirthday != nil && phone != nil {
                         let sendButton: [TGInlineKeyboardButton] = [.init(text: "Отправить заявку", callbackData: "mailSend")]
                         
                         buttons.append(sendButton)
@@ -98,14 +98,13 @@ final class PrimaryAppointmentHandler {
                     dateOfBirthday = update.message?.text
                     
                     
-                    dateOfBirthButton = [.init(text: dateOfBirthday!, callbackData: "birtheyData")]
+                    dateOfBirthButton = [.init(text: "Дата рождения: \(dateOfBirthday!)", callbackData: "birtheyData")]
                     var buttons: [[TGInlineKeyboardButton]] = [nameButton, phoneButton, dateOfBirthButton]
                     
-                    if name != nil && dateOfBirthday != nil {
+                    if name != nil && dateOfBirthday != nil && phone != nil {
                         let sendButton: [TGInlineKeyboardButton] = [.init(text: "Отправить заявку", callbackData: "mailSend")]
                         
                         buttons.append(sendButton)
-                        print(buttons)
                     }
                     
                     let keybord: TGInlineKeyboardMarkup = .init(inlineKeyboard: buttons)
@@ -114,6 +113,25 @@ final class PrimaryAppointmentHandler {
                     itsDateOfBithday = false
                     try bot.sendMessage(params: params)
                     
+                    } else if itsPhone == true{
+                        
+                        phone = update.message?.text
+                        
+                        phoneButton = [.init(text: "Телефон: \(phone!)", callbackData: "phoneNumber")]
+                        
+                        var buttons: [[TGInlineKeyboardButton]] = [nameButton, phoneButton, dateOfBirthButton]
+                        
+                        if name != nil && dateOfBirthday != nil && phone != nil {
+                            let sendButton: [TGInlineKeyboardButton] = [.init(text: "Отправить заявку", callbackData: "mailSend")]
+                            
+                            buttons.append(sendButton)
+                        }
+                        
+                        let keybord: TGInlineKeyboardMarkup = .init(inlineKeyboard: buttons)
+                        let params: TGSendMessageParams = .init(chatId: .chat(userId), text: textSendMessage, replyMarkup: .inlineKeyboardMarkup(keybord))
+                        
+                        itsPhone = false
+                        try bot.sendMessage(params: params)
                     } else {}
     }
             bot.connection.dispatcher.add(handler1)
@@ -158,8 +176,13 @@ final class PrimaryAppointmentHandler {
         
         
         let handler = TGCallbackQueryHandler(pattern: "phoneNumber") { update, bot in
+            guard let userId = update.callbackQuery?.message?.chat.id else { fatalError("user id not found") }
+            let params: TGSendMessageParams = .init(chatId: .chat(userId), text: "Номер телефона")
+            itsPhone = true
+            try bot.sendMessage(params: params)
             
         }
+        bot.connection.dispatcher.add(handler)
     }
           
           
@@ -168,8 +191,10 @@ final class PrimaryAppointmentHandler {
         let handler = TGCallbackQueryHandler(pattern: "mailSend") { update, bot in
             guard let userId = update.callbackQuery?.message?.chat.id else { fatalError("user id not found") }
             let params: TGSendMessageParams = .init(chatId: .chat(userId), text: "Запрос отправлен")
+          
            try bot.sendMessage(params: params)
-           
+            
+
             clearData()
         }
         bot.connection.dispatcher.add(handler)
